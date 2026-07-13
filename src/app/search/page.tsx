@@ -59,7 +59,7 @@ function SearchContent() {
   const handlePageChange = (newPage: number) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     current.set('page', newPage.toString());
-    router.push(`/tim-kiem?${current.toString()}`);
+    router.push(`/search?${current.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

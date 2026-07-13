@@ -24,31 +24,31 @@ const Footer: React.FC = () => {
               Khám phá
             </h3>
             <Link
-              href="/phim/bo"
+              href="/movies/bo"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               Phim bộ
             </Link>
             <Link
-              href="/phim/le"
+              href="/movies/le"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               Phim lẻ
             </Link>
             <Link
-              href="/phim/hoat-hinh"
+              href="/movies/hoat-hinh"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               Hoạt hình
             </Link>
             <Link
-              href="/phim/tv-shows"
+              href="/movies/tv-shows"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               TV Shows
             </Link>
             <Link
-              href="/phim/phim-chieu-rap"
+              href="/movies/phim-chieu-rap"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               Chiếu rạp

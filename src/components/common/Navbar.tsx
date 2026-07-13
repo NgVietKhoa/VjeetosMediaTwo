@@ -9,11 +9,11 @@ import { Genre, Country } from "@/types/movie";
 
 const NAV_LINKS = [
   { href: "/", label: "Trang Chủ" },
-  { href: "/phim/le", label: "Phim Lẻ" },
-  { href: "/phim/bo", label: "Phim Bộ" },
-  { href: "/phim/hoat-hinh", label: "Hoạt Hình" },
-  { href: "/phim/tv-shows", label: "TV Shows" },
-  { href: "/phim/phim-chieu-rap", label: "Chiếu Rạp" },
+  { href: "/movies/le", label: "Phim Lẻ" },
+  { href: "/movies/bo", label: "Phim Bộ" },
+  { href: "/movies/hoat-hinh", label: "Hoạt Hình" },
+  { href: "/movies/tv-shows", label: "TV Shows" },
+  { href: "/movies/phim-chieu-rap", label: "Chiếu Rạp" },
 ] as const;
 
 const Navbar = () => {
@@ -47,7 +47,6 @@ const Navbar = () => {
       loadTaxonomy();
     } else {
       document.body.style.overflow = "unset";
-      setOpenMobileSection(null);
     }
     return () => {
       document.body.style.overflow = "unset";
@@ -65,6 +64,19 @@ const Navbar = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setOpenMobileSection(null);
+  };
+
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      setIsMenuOpen(true);
+    }
+  };
+
   const lastSearchTime = useRef(0);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,9 +85,9 @@ const Navbar = () => {
     lastSearchTime.current = now;
 
     if (searchQuery.trim()) {
-      router.push(`/tim-kiem?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
-      setIsMenuOpen(false);
+      closeMenu();
     }
   };
 
@@ -84,26 +96,26 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full z-[1000]">
       <div className="w-full flex items-center h-16 bg-bg-surface/95 backdrop-blur-md border-b border-border/80 shadow-md">
-        <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-6 relative">
+        <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 lg:gap-6 relative">
           
-          {/* Left section: Logo & Search Box */}
-          <div className="flex items-center gap-6 flex-1 max-w-[500px]">
+          {/* Left section: Logo & desktop Search */}
+          <div className="flex items-center gap-4 lg:gap-6 shrink-0 md:flex-1 md:max-w-[500px] min-w-0">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0">
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="w-11 h-11 object-contain transition-transform group-hover:scale-105"
+                className="w-10 h-10 sm:w-11 sm:h-11 object-contain transition-transform group-hover:scale-105"
               />
               <div className="hidden xl:block font-display text-lg font-bold tracking-tight text-text-primary">
                 VJEETOS<span className="text-accent-gold ml-0.5">MEDIA</span>
               </div>
             </Link>
 
-            {/* Search Input */}
+            {/* Search Input — tablet/desktop */}
             <form
               onSubmit={handleSearch}
-              className="hidden md:flex relative items-center flex-1"
+              className="hidden md:flex relative items-center flex-1 min-w-0"
             >
               <input
                 type="text"
@@ -144,7 +156,7 @@ const Navbar = () => {
                     {genres.map((g) => (
                       <Link
                         key={g._id || g.slug}
-                        href={`/phim/moi?category=${g.slug}`}
+                        href={`/movies/moi?category=${g.slug}`}
                         className="text-sm font-medium text-text-secondary hover:text-accent-gold transition-colors block"
                       >
                         {g.name}
@@ -170,7 +182,7 @@ const Navbar = () => {
                     {countries.map((c) => (
                       <Link
                         key={c._id || c.slug}
-                        href={`/phim/moi?country=${c.slug}`}
+                        href={`/movies/moi?country=${c.slug}`}
                         className="text-sm font-medium text-text-secondary hover:text-accent-gold transition-colors block"
                       >
                         {c.name}
@@ -193,21 +205,22 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Icon */}
-          <div className="flex items-center lg:hidden gap-3">
-            <form onSubmit={handleSearch} className="relative md:hidden flex max-w-[150px]">
+          {/* Mobile search + menu — search fills remaining space */}
+          <div className="flex items-center lg:hidden gap-2 flex-1 md:flex-none min-w-0 justify-end">
+            <form onSubmit={handleSearch} className="relative md:hidden flex flex-1 min-w-0">
               <input
                 type="text"
-                placeholder="Tìm..."
+                placeholder="Tìm kiếm phim..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-bg-elevated border border-border/80 rounded-md py-1.5 pl-8 pr-2.5 text-text-primary text-xs w-full focus:outline-none placeholder:text-text-muted"
+                className="bg-bg-elevated border border-border/80 rounded-md py-2 pl-8 pr-3 text-text-primary text-xs w-full focus:outline-none focus:border-accent-gold placeholder:text-text-muted"
               />
-              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             </form>
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-text-primary outline-none w-9 h-9 flex items-center justify-center bg-bg-surface rounded-lg border border-border hover:border-border-strong transition-colors"
+              type="button"
+              onClick={toggleMenu}
+              className="text-text-primary outline-none w-9 h-9 shrink-0 flex items-center justify-center bg-bg-surface rounded-lg border border-border hover:border-border-strong transition-colors"
             >
               {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -219,7 +232,7 @@ const Navbar = () => {
       <div
         className={`fixed inset-0 bg-bg-void/85 backdrop-blur-sm z-[2000] transition-opacity duration-300 lg:hidden
           ${isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        onClick={() => setIsMenuOpen(false)}
+        onClick={closeMenu}
       />
 
       <div
@@ -234,7 +247,7 @@ const Navbar = () => {
             </div>
           </div>
           <button
-            onClick={() => setIsMenuOpen(false)}
+            onClick={closeMenu}
             className="text-text-secondary hover:text-text-primary p-2 bg-bg-elevated rounded-lg border border-border"
           >
             <X size={18} />
@@ -249,7 +262,7 @@ const Navbar = () => {
                 href={link.href}
                 className={`text-sm font-semibold tracking-wide block py-2.5 border-b border-border/40 transition-colors
                   ${isActive(link.href) ? "text-accent-gold" : "text-text-secondary hover:text-text-primary"}`}
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMenu}
               >
                 {link.label}
               </Link>
@@ -280,9 +293,9 @@ const Navbar = () => {
                       {genres.map((g) => (
                         <Link
                           key={g._id || g.slug}
-                          href={`/phim/moi?category=${g.slug}`}
+                          href={`/movies/moi?category=${g.slug}`}
                           className="text-xs font-medium text-text-secondary hover:text-accent-gold transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
+                          onClick={closeMenu}
                         >
                           {g.name}
                         </Link>
@@ -318,9 +331,9 @@ const Navbar = () => {
                       {countries.map((c) => (
                         <Link
                           key={c._id || c.slug}
-                          href={`/phim/moi?country=${c.slug}`}
+                          href={`/movies/moi?country=${c.slug}`}
                           className="text-xs font-medium text-text-secondary hover:text-accent-gold transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
+                          onClick={closeMenu}
                         >
                           {c.name}
                         </Link>

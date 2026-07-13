@@ -7,7 +7,12 @@ import MovieCard from "@/components/movie/MovieCard";
 import HeroBanner from "@/components/home/HeroBanner";
 import Top10Carousel from "@/components/home/Top10Carousel";
 import SprocketDivider from "@/components/common/SprocketDivider";
-import LazySection, { SectionSkeleton } from "@/components/common/LazySection";
+import LazySection, {
+  Top10Skeleton,
+  TopSeriesBlockSkeleton,
+  AnimeSkeleton,
+  RegionalSkeleton,
+} from "@/components/common/LazySection";
 import { phimApi } from "@/api/phim.api";
 import { Movie, MovieDetail } from "@/types/movie";
 import { historyUtil, HistoryItem, SavedMovie } from "@/utils/history";
@@ -23,17 +28,17 @@ const fixLegacyImgUrl = (url: string): string => {
 };
 
 const TOPIC_CARDS = [
-  { href: "/phim/moi?category=tam-ly&title=Chữa+lành", title: "Chữa lành", gradient: "from-[#e05697] to-[#c13c7a]", shadow: "hover:shadow-pink-500/10" },
-  { href: "/tim-kiem?q=Marvel", title: "Marvel", gradient: "from-[#1e4ed8] to-[#1d40af]", shadow: "hover:shadow-blue-500/10" },
-  { href: "/phim/hoat-hinh?title=Kho+Tàng+Anime+Mới...", title: "Kho Tàng<br />Anime Mới...", gradient: "from-[#7c3aed] to-[#6d28d9]", shadow: "hover:shadow-violet-500/10" },
-  { href: "/phim/le?title=Top+10+phim+lẻ+hôm+nay", title: "Top 10 phim<br />lẻ hôm nay", gradient: "from-[#f59e0b] to-[#d97706]", shadow: "hover:shadow-amber-500/10" },
-  { href: "/phim/moi?category=co-trang&title=Cổ+Trang", title: "Cổ Trang", gradient: "from-[#b91c1c] to-[#991b1b]", shadow: "hover:shadow-red-500/10" },
-  { href: "/phim/le?title=Phim+Điện+Ảnh+Mới...", title: "Phim Điện<br />Ảnh Mới...", gradient: "from-[#10b981] to-[#059669]", shadow: "hover:shadow-emerald-500/10" },
+  { href: "/movies/moi?category=tam-ly&title=Chữa+lành", title: "Chữa lành", gradient: "from-[#e05697] to-[#c13c7a]", shadow: "hover:shadow-pink-500/10" },
+  { href: "/search?q=Marvel", title: "Marvel", gradient: "from-[#1e4ed8] to-[#1d40af]", shadow: "hover:shadow-blue-500/10" },
+  { href: "/movies/hoat-hinh?title=Kho+Tàng+Anime+Mới...", title: "Kho Tàng<br />Anime Mới...", gradient: "from-[#7c3aed] to-[#6d28d9]", shadow: "hover:shadow-violet-500/10" },
+  { href: "/movies/le?title=Top+10+phim+lẻ+hôm+nay", title: "Top 10 phim<br />lẻ hôm nay", gradient: "from-[#f59e0b] to-[#d97706]", shadow: "hover:shadow-amber-500/10" },
+  { href: "/movies/moi?category=co-trang&title=Cổ+Trang", title: "Cổ Trang", gradient: "from-[#b91c1c] to-[#991b1b]", shadow: "hover:shadow-red-500/10" },
+  { href: "/movies/le?title=Phim+Điện+Ảnh+Mới...", title: "Phim Điện<br />Ảnh Mới...", gradient: "from-[#10b981] to-[#059669]", shadow: "hover:shadow-emerald-500/10" },
 ];
 
 const PersonalPosterCard = ({ item }: { item: SavedMovie }) => (
   <Link
-    href={`/phim/chi-tiet/${item.slug}`}
+    href={`/movies/detail/${item.slug}`}
     className="flex-shrink-0 w-[120px] sm:w-[150px] group relative block"
   >
     <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-border group-hover:border-accent-gold transition-all duration-180">
@@ -286,9 +291,12 @@ export default function Home() {
         </section>
 
         {/* Top 10 Series Section — load when scrolled near */}
-        <LazySection minHeight={420} onVisible={loadTopSeriesBlock}>
+        <LazySection
+          fallback={<TopSeriesBlockSkeleton />}
+          onVisible={loadTopSeriesBlock}
+        >
           {!topSeriesReady ? (
-            <SectionSkeleton height={420} />
+            <TopSeriesBlockSkeleton />
           ) : topSeries.length > 0 ? (
           <>
             <Top10Carousel
@@ -304,7 +312,7 @@ export default function Home() {
                 <section className="py-8">
                   <div className="mb-6 flex items-center gap-3">
                     <Link
-                      href="/phim/chieu-rap?title=Phim+Chiếu+Rạp"
+                      href="/movies/chieu-rap?title=Phim+Chiếu+Rạp"
                       className="group flex items-center gap-2 hover:text-accent-gold transition-colors"
                     >
                       <h2 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight group-hover:text-accent-gold transition-colors">
@@ -340,7 +348,7 @@ export default function Home() {
                       {cinemaMovies.map((movie) => (
                         <Link
                           key={movie._id}
-                          href={`/phim/chi-tiet/${movie.slug}`}
+                          href={`/movies/detail/${movie.slug}`}
                           className="flex-shrink-0 w-[280px] sm:w-[320px] group/card snap-start flex flex-col relative"
                         >
                           {/* Landscape backdrop image container */}
@@ -407,9 +415,9 @@ export default function Home() {
         </LazySection>
 
         {/* Top 10 Single Movies Section */}
-        <LazySection minHeight={420} onVisible={loadTopSingleBlock}>
+        <LazySection fallback={<Top10Skeleton />} onVisible={loadTopSingleBlock}>
           {!topSingleReady ? (
-            <SectionSkeleton height={420} />
+            <Top10Skeleton />
           ) : topSingleMovies.length > 0 ? (
           <>
             <Top10Carousel
@@ -423,15 +431,15 @@ export default function Home() {
         </LazySection>
 
         {/* Anime Showcase Section */}
-        <LazySection minHeight={480} onVisible={loadAnimeBlock}>
+        <LazySection fallback={<AnimeSkeleton />} onVisible={loadAnimeBlock}>
           {!animeReady ? (
-            <SectionSkeleton height={480} />
+            <AnimeSkeleton />
           ) : animeMovies.length > 0 ? (
           <>
             <section className="py-8">
               <div className="mb-6 flex items-center gap-3">
                 <Link
-                  href="/phim/hoat-hinh?title=Hoạt+Hình"
+                  href="/movies/hoat-hinh?title=Hoạt+Hình"
                   className="group flex items-center gap-2 hover:text-accent-gold transition-colors"
                 >
                   <h2 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight group-hover:text-accent-gold transition-colors">
@@ -501,7 +509,7 @@ export default function Home() {
                       {/* Play and Action buttons */}
                       <div className="flex items-center gap-3.5 mt-5 sm:mt-6">
                         <Link
-                          href={`/phim/chi-tiet/${selectedAnime.slug}`}
+                          href={`/movies/detail/${selectedAnime.slug}`}
                           className="w-11 h-11 rounded-full bg-accent-gold text-bg-void flex items-center justify-center hover:scale-105 transition-transform shadow-lg cursor-pointer"
                         >
                           <Play size={18} className="fill-bg-void text-bg-void translate-x-0.5" />
@@ -529,7 +537,7 @@ export default function Home() {
                           />
                         </button>
                         <Link
-                          href={`/phim/chi-tiet/${selectedAnime.slug}`}
+                          href={`/movies/detail/${selectedAnime.slug}`}
                           className="w-10 h-10 rounded-full bg-bg-surface/80 border border-border/80 text-text-primary flex items-center justify-center hover:border-accent-gold hover:text-accent-gold transition-colors cursor-pointer"
                         >
                           <Info size={16} />
@@ -540,26 +548,29 @@ export default function Home() {
                 </div>
 
                 {/* Bottom Center-Aligned Miniatures Navigation (sitting exactly on the bottom border) */}
-                <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 z-30 flex justify-center px-6">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 justify-center max-w-full">
+                <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 z-30 flex justify-center px-4 sm:px-6 overflow-visible">
+                  <div className="flex gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-2.5 px-3 sm:px-4 justify-start sm:justify-center max-w-full">
                     {animeMovies.map((anime) => {
                       const isSelected = selectedAnime?._id === anime._id;
                       return (
                         <button
+                          type="button"
                           key={anime._id}
                           onClick={() => setSelectedAnime(anime)}
-                          className={`flex-shrink-0 w-[36px] sm:w-[48px] aspect-[2/3] rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
-                            isSelected 
-                              ? 'border-accent-gold ring-1 ring-accent-gold scale-105' 
-                              : 'border-border/80 hover:border-accent-gold hover:scale-[1.03]'
+                          className={`flex-shrink-0 w-[36px] sm:w-[48px] aspect-[2/3] rounded-lg transition-all duration-200 cursor-pointer first:ml-0.5 last:mr-0.5 ${
+                            isSelected
+                              ? "border-2 border-accent-gold ring-2 ring-accent-gold/50 scale-105"
+                              : "border border-border/80 hover:border-accent-gold hover:scale-[1.03]"
                           }`}
                         >
-                          <img
-                            src={anime.poster_url || anime.thumb_url || '/placeholder.png'}
-                            alt={anime.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
+                          <span className="block w-full h-full overflow-hidden rounded-[6px]">
+                            <img
+                              src={anime.poster_url || anime.thumb_url || "/placeholder.png"}
+                              alt={anime.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          </span>
                         </button>
                       );
                     })}
@@ -573,9 +584,9 @@ export default function Home() {
         </LazySection>
 
         {/* Regional Movies Section */}
-        <LazySection minHeight={360} onVisible={loadRegionalBlock}>
+        <LazySection fallback={<RegionalSkeleton />} onVisible={loadRegionalBlock}>
           {!regionalReady ? (
-            <SectionSkeleton height={360} />
+            <RegionalSkeleton />
           ) : (koreanMovies.length > 0 || chineseMovies.length > 0 || usukMovies.length > 0) ? (
           <>
             <section className="py-8">
@@ -620,7 +631,7 @@ export default function Home() {
               </div>
             </div>
             <Link
-              href="/phim/moi"
+              href="/movies/moi"
               className="group flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-accent-gold transition-colors shrink-0"
             >
               Xem tất cả{" "}
@@ -743,7 +754,7 @@ const RegionalRow = ({
           {titlePrefix} <span className="text-accent-gold block lg:inline">{titleHighlight}</span> mới
         </h3>
         <Link
-          href={`/phim/moi?country=${countrySlug}`}
+          href={`/movies/moi?country=${countrySlug}`}
           className="text-xs font-semibold text-text-secondary hover:text-accent-gold transition-colors mt-2.5 flex items-center gap-1 group"
         >
           Xem toàn bộ <span className="transition-transform group-hover:translate-x-0.5">›</span>
@@ -776,7 +787,7 @@ const RegionalRow = ({
           {movies.map((movie) => (
             <Link
               key={movie._id}
-              href={`/phim/chi-tiet/${movie.slug}`}
+              href={`/movies/detail/${movie.slug}`}
               className="flex-shrink-0 w-[180px] sm:w-[220px] group/card snap-start"
             >
               {/* Landscape image container */}

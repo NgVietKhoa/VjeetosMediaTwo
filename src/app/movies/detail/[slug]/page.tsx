@@ -88,8 +88,8 @@ function MovieDetailContent() {
   }
 
   const defaultWatchUrl = episodes[0]?.server_data[0]?.slug
-    ? `/xem/${movie.slug}?tap=${episodes[0].server_data[0].slug}`
-    : `/xem/${movie.slug}`;
+    ? `/watch/${movie.slug}?tap=${episodes[0].server_data[0].slug}`
+    : `/watch/${movie.slug}`;
 
   return (
     <main className="pb-12 sm:pb-20">
@@ -98,12 +98,12 @@ function MovieDetailContent() {
         <div className="absolute inset-0 z-0">
           <div
             className="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-40 bg-cover bg-top"
-            style={{ backgroundImage: `url(${movie.poster_url})` }}
+            style={{ backgroundImage: `url(${movie.thumb_url || movie.poster_url})` }}
             aria-hidden="true"
           />
 
           <img
-            src={movie.poster_url}
+            src={movie.thumb_url || movie.poster_url}
             alt={movie.name}
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -235,7 +235,7 @@ function MovieDetailContent() {
                       {server.server_data.map((ep) => (
                         <Link
                           key={ep.slug}
-                          href={`/xem/${movie.slug}?tap=${ep.slug}`}
+                          href={`/watch/${movie.slug}?tap=${ep.slug}`}
                           className="flex h-9 min-w-[70px] px-3.5 items-center justify-center rounded-md border border-border bg-bg-elevated text-xs font-semibold text-text-secondary transition-colors hover:bg-accent-gold hover:text-bg-void hover:border-accent-gold active:scale-95 cursor-pointer"
                         >
                           {ep.name}

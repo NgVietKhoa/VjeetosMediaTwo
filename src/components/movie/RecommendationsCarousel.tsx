@@ -54,7 +54,7 @@ export default function RecommendationsCarousel({
             </button>
             <div
               ref={scrollRef}
-              className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth snap-x snap-mandatory"
+              className="flex gap-4 overflow-x-auto pt-2 pb-4 px-2 -mx-2 no-scrollbar scroll-smooth snap-x snap-mandatory"
             >
               {movies.map((recMovie) => (
                 <div

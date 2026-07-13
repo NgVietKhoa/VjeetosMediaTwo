@@ -16,7 +16,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
     : movie.category || '';
 
   return (
-    <Link href={`/phim/chi-tiet/${movie.slug}`} className="group relative block rounded-lg overflow-hidden border border-border bg-bg-surface hover:border-accent-gold transition-all duration-180 ease-out hover:scale-104 select-none">
+    <Link href={`/movies/detail/${movie.slug}`} className="group relative block rounded-lg overflow-hidden border border-border bg-bg-surface hover:border-accent-gold transition-all duration-180 ease-out select-none">
       {/* Aspect Ratio Box (2:3) */}
       <div className="relative w-full aspect-[2/3] bg-bg-elevated overflow-hidden">
         <img

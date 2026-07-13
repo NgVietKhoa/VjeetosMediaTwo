@@ -122,14 +122,14 @@ function MovieListContent() {
     if (tempYear) query.set('year', tempYear);
     
     // Redirect to type page with search parameters
-    router.push(`/phim/${tempType}?${query.toString()}`);
+    router.push(`/movies/${tempType}?${query.toString()}`);
     setIsFilterOpen(false);
   };
 
   const handlePageChange = (newPage: number) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     current.set('page', newPage.toString());
-    router.push(`/phim/${typeFromUrl}?${current.toString()}`);
+    router.push(`/movies/${typeFromUrl}?${current.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -341,7 +341,7 @@ function MovieListContent() {
             Không tìm thấy bộ phim nào khớp với các lựa chọn lọc hiện tại.
           </p>
           <button
-            onClick={() => router.push(`/phim/${typeFromUrl}`)}
+            onClick={() => router.push(`/movies/${typeFromUrl}`)}
             className="px-4 py-2 bg-accent-gold hover:bg-accent-gold-hover text-bg-void text-xs font-bold rounded uppercase tracking-wider transition-all cursor-pointer"
           >
             Đặt lại bộ lọc

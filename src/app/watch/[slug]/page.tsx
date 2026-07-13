@@ -84,7 +84,7 @@ function WatchContent() {
   }, [allServerTaps, currentTap]);
 
   const updateTapUrl = (newTapSlug: string) => {
-    router.push(`/xem/${slug}?tap=${newTapSlug}`);
+    router.push(`/watch/${slug}?tap=${newTapSlug}`);
   };
 
   const handleNext = () => {
@@ -134,11 +134,11 @@ function WatchContent() {
             Trang chủ
           </Link>
           <ChevronRight size={12} className="text-text-muted" />
-          <Link href={`/phim/${movie.type === "series" ? "bo" : "le"}`} className="hover:text-accent-gold transition-colors">
+          <Link href={`/movies/${movie.type === "series" ? "bo" : "le"}`} className="hover:text-accent-gold transition-colors">
             {movie.type === "series" ? "Phim bộ" : "Phim lẻ"}
           </Link>
           <ChevronRight size={12} className="text-text-muted" />
-          <Link href={`/phim/chi-tiet/${movie.slug}`} className="hover:text-accent-gold transition-colors max-w-[120px] sm:max-w-[200px] truncate">
+          <Link href={`/movies/detail/${movie.slug}`} className="hover:text-accent-gold transition-colors max-w-[120px] sm:max-w-[200px] truncate">
             {movie.name}
           </Link>
           <ChevronRight size={12} className="text-text-muted" />
@@ -274,7 +274,7 @@ function WatchContent() {
                 dangerouslySetInnerHTML={{ __html: movie.content || "Nội dung phim đang cập nhật..." }}
               />
               <Link
-                href={`/phim/chi-tiet/${movie.slug}`}
+                href={`/movies/detail/${movie.slug}`}
                 className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-accent-gold hover:underline"
               >
                 <span>Xem chi tiết phim</span>

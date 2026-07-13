@@ -50,7 +50,7 @@ export default function Top10Carousel({
           {movies.map((movie, index) => (
             <Link
               key={movie._id}
-              href={`/phim/chi-tiet/${movie.slug}`}
+              href={`/movies/detail/${movie.slug}`}
               className="flex-shrink-0 w-[160px] sm:w-[200px] group/card snap-start flex flex-col"
             >
               <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-border group-hover/card:border-accent-gold transition-all duration-180 bg-bg-elevated">

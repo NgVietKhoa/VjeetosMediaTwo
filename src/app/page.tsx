@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { ArrowRight, Play, ChevronLeft, ChevronRight, Heart, Info, Loader2 } from "lucide-react";
 import MovieCard from "@/components/movie/MovieCard";
 import HeroBanner from "@/components/home/HeroBanner";
 import Top10Carousel from "@/components/home/Top10Carousel";
 import SprocketDivider from "@/components/common/SprocketDivider";
+import LazySection, { SectionSkeleton } from "@/components/common/LazySection";
 import { phimApi } from "@/api/phim.api";
 import { Movie, MovieDetail } from "@/types/movie";
 import { historyUtil, HistoryItem, SavedMovie } from "@/utils/history";
@@ -40,6 +41,7 @@ const PersonalPosterCard = ({ item }: { item: SavedMovie }) => (
         src={fixLegacyImgUrl(item.poster) || '/placeholder.png'}
         alt={item.name}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
       />
       <div className="absolute inset-0 bg-bg-void/40 opacity-0 group-hover:opacity-100 transition-opacity duration-180 flex items-center justify-center">
         <div className="w-10 h-10 rounded-full bg-accent-gold flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform duration-180">
@@ -77,54 +79,100 @@ export default function Home() {
   const watchlistRef = useRef<HTMLDivElement>(null);
   const cinemaMoviesRef = useRef<HTMLDivElement>(null);
 
+  const [topSeriesReady, setTopSeriesReady] = useState(false);
+  const [topSingleReady, setTopSingleReady] = useState(false);
+  const [animeReady, setAnimeReady] = useState(false);
+  const [regionalReady, setRegionalReady] = useState(false);
+
+  // Only load hero / "phim mới" on first paint — other sections wait for scroll
   useEffect(() => {
-    // Load initial updates
-    const fetchInitialData = async () => {
+    const fetchHero = async () => {
       setIsLoading(true);
       try {
-        const [res, krRes, cnRes, usRes, topSeriesRes, cinemaRes, topSingleRes, animeRes] = await Promise.all([
-          phimApi.getNewUpdates(1),
-          phimApi.getMovieList('moi', { country: 'han-quoc', page: 1 }).catch(() => null),
-          phimApi.getMovieList('moi', { country: 'trung-quoc', page: 1 }).catch(() => null),
-          phimApi.getMovieList('moi', { country: 'au-my', page: 1 }).catch(() => null),
-          phimApi.getMovieList('bo', { page: 1 }).catch(() => null),
-          phimApi.getMovieList('phim-chieu-rap', { page: 1 }).catch(() => null),
-          phimApi.getMovieList('le', { page: 1 }).catch(() => null),
-          phimApi.getMovieList('hoat-hinh', { country: 'nhat-ban', page: 1 }).catch(() => null),
-        ]);
-
+        const res = await phimApi.getNewUpdates(1);
         if (res?.items) {
           setMovies(res.items);
           setHasMore(1 < res.pagination.totalPages);
         }
-        if (krRes?.items) setKoreanMovies(krRes.items);
-        if (cnRes?.items) setChineseMovies(cnRes.items);
-        if (usRes?.items) setUsukMovies(usRes.items);
-        if (topSeriesRes?.items) setTopSeries(topSeriesRes.items.slice(0, 10));
-        if (cinemaRes?.items) setCinemaMovies(cinemaRes.items);
-        if (topSingleRes?.items) setTopSingleMovies(topSingleRes.items.slice(0, 10));
-
-        if (animeRes?.items && animeRes.items.length > 0) {
-          const list = animeRes.items.slice(0, 14);
-          setAnimeMovies(list);
-          setSelectedAnime(list[0]);
-        }
       } catch (error) {
-        console.error("Failed to load initial updates:", error);
+        console.error("Failed to load hero updates:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchInitialData();
+    fetchHero();
 
-    // Load local history & watchlist asynchronously to avoid synchronous setState in effect warnings
     const timer = setTimeout(() => {
       setHistory(historyUtil.get());
       setWatchlist(watchlistUtil.get());
     }, 0);
     return () => clearTimeout(timer);
   }, []);
+
+  const loadTopSeriesBlock = useCallback(async () => {
+    if (topSeriesReady) return;
+    try {
+      const [topSeriesRes, cinemaRes] = await Promise.all([
+        phimApi.getMovieList("bo", { page: 1 }).catch(() => null),
+        phimApi.getMovieList("phim-chieu-rap", { page: 1 }).catch(() => null),
+      ]);
+      if (topSeriesRes?.items) setTopSeries(topSeriesRes.items.slice(0, 10));
+      if (cinemaRes?.items) setCinemaMovies(cinemaRes.items);
+    } catch (error) {
+      console.error("Failed to load top series block:", error);
+    } finally {
+      setTopSeriesReady(true);
+    }
+  }, [topSeriesReady]);
+
+  const loadTopSingleBlock = useCallback(async () => {
+    if (topSingleReady) return;
+    try {
+      const topSingleRes = await phimApi.getMovieList("le", { page: 1 }).catch(() => null);
+      if (topSingleRes?.items) setTopSingleMovies(topSingleRes.items.slice(0, 10));
+    } catch (error) {
+      console.error("Failed to load top single block:", error);
+    } finally {
+      setTopSingleReady(true);
+    }
+  }, [topSingleReady]);
+
+  const loadAnimeBlock = useCallback(async () => {
+    if (animeReady) return;
+    try {
+      const animeRes = await phimApi
+        .getMovieList("hoat-hinh", { country: "nhat-ban", page: 1 })
+        .catch(() => null);
+      if (animeRes?.items && animeRes.items.length > 0) {
+        const list = animeRes.items.slice(0, 14);
+        setAnimeMovies(list);
+        setSelectedAnime(list[0]);
+      }
+    } catch (error) {
+      console.error("Failed to load anime block:", error);
+    } finally {
+      setAnimeReady(true);
+    }
+  }, [animeReady]);
+
+  const loadRegionalBlock = useCallback(async () => {
+    if (regionalReady) return;
+    try {
+      const [krRes, cnRes, usRes] = await Promise.all([
+        phimApi.getMovieList("moi", { country: "han-quoc", page: 1 }).catch(() => null),
+        phimApi.getMovieList("moi", { country: "trung-quoc", page: 1 }).catch(() => null),
+        phimApi.getMovieList("moi", { country: "au-my", page: 1 }).catch(() => null),
+      ]);
+      if (krRes?.items) setKoreanMovies(krRes.items);
+      if (cnRes?.items) setChineseMovies(cnRes.items);
+      if (usRes?.items) setUsukMovies(usRes.items);
+    } catch (error) {
+      console.error("Failed to load regional block:", error);
+    } finally {
+      setRegionalReady(true);
+    }
+  }, [regionalReady]);
 
   // Fetch detailed info of selected Anime
   useEffect(() => {
@@ -237,8 +285,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Top 10 Series Section */}
-        {topSeries.length > 0 && (
+        {/* Top 10 Series Section — load when scrolled near */}
+        <LazySection minHeight={420} onVisible={loadTopSeriesBlock}>
+          {!topSeriesReady ? (
+            <SectionSkeleton height={420} />
+          ) : topSeries.length > 0 ? (
           <>
             <Top10Carousel
               title="Top 10 phim bộ hôm nay"
@@ -352,10 +403,14 @@ export default function Home() {
               </>
             )}
           </>
-        )}
+          ) : null}
+        </LazySection>
 
         {/* Top 10 Single Movies Section */}
-        {topSingleMovies.length > 0 && (
+        <LazySection minHeight={420} onVisible={loadTopSingleBlock}>
+          {!topSingleReady ? (
+            <SectionSkeleton height={420} />
+          ) : topSingleMovies.length > 0 ? (
           <>
             <Top10Carousel
               title="Top 10 phim lẻ hôm nay"
@@ -364,10 +419,14 @@ export default function Home() {
             />
             <SprocketDivider />
           </>
-        )}
+          ) : null}
+        </LazySection>
 
         {/* Anime Showcase Section */}
-        {animeMovies.length > 0 && (
+        <LazySection minHeight={480} onVisible={loadAnimeBlock}>
+          {!animeReady ? (
+            <SectionSkeleton height={480} />
+          ) : animeMovies.length > 0 ? (
           <>
             <section className="py-8">
               <div className="mb-6 flex items-center gap-3">
@@ -510,10 +569,14 @@ export default function Home() {
             </section>
             <SprocketDivider />
           </>
-        )}
+          ) : null}
+        </LazySection>
 
         {/* Regional Movies Section */}
-        {(koreanMovies.length > 0 || chineseMovies.length > 0 || usukMovies.length > 0) && (
+        <LazySection minHeight={360} onVisible={loadRegionalBlock}>
+          {!regionalReady ? (
+            <SectionSkeleton height={360} />
+          ) : (koreanMovies.length > 0 || chineseMovies.length > 0 || usukMovies.length > 0) ? (
           <>
             <section className="py-8">
               <div className="bg-bg-surface/50 border border-border/80 p-6 sm:p-8 rounded-2xl shadow-2xl flex flex-col gap-4">
@@ -539,7 +602,8 @@ export default function Home() {
             </section>
             <SprocketDivider />
           </>
-        )}
+          ) : null}
+        </LazySection>
 
         {/* New Updates Section */}
         <section className="pt-8">

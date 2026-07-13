@@ -20,7 +20,6 @@ import { MovieDetail, Episode } from "@/types/movie";
 import VideoPlayer from "@/components/player/VideoPlayer";
 import { historyUtil } from "@/utils/history";
 import RecommendationsCarousel from "@/components/movie/RecommendationsCarousel";
-import { useRecommendations } from "@/hooks/useRecommendations";
 
 function WatchContent() {
   const params = useParams();
@@ -36,7 +35,6 @@ function WatchContent() {
   const [currentServerIdx, setCurrentServerIdx] = useState(0);
   const [isLightsOff, setIsLightsOff] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const recommendations = useRecommendations(slug, movie?.type);
 
   useEffect(() => {
     const fetchWatchData = async () => {
@@ -322,7 +320,8 @@ function WatchContent() {
       </div>
 
       <RecommendationsCarousel
-        movies={recommendations}
+        slug={slug}
+        movieType={movie.type}
         className="max-w-[1600px] mx-auto px-4 sm:px-6 mt-12 sm:mt-16"
       />
     </main>

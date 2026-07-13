@@ -18,7 +18,6 @@ import { MovieDetail, Episode } from "@/types/movie";
 import { watchlistUtil } from "@/utils/watchlist";
 import SprocketDivider from "@/components/common/SprocketDivider";
 import RecommendationsCarousel from "@/components/movie/RecommendationsCarousel";
-import { useRecommendations } from "@/hooks/useRecommendations";
 
 function MovieDetailContent() {
   const params = useParams();
@@ -28,7 +27,6 @@ function MovieDetailContent() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
-  const recommendations = useRecommendations(slug, movie?.type);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -289,7 +287,7 @@ function MovieDetailContent() {
         </div>
       </div>
 
-      <RecommendationsCarousel movies={recommendations} />
+      <RecommendationsCarousel slug={slug} movieType={movie.type} />
     </main>
   );
 }

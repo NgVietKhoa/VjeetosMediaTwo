@@ -36,16 +36,22 @@ const Footer: React.FC = () => {
               Phim lẻ
             </Link>
             <Link
+              href="/phim/hoat-hinh"
+              className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
+            >
+              Hoạt hình
+            </Link>
+            <Link
               href="/phim/tv-shows"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
               TV Shows
             </Link>
             <Link
-              href="/phim/hoat-hinh"
+              href="/phim/phim-chieu-rap"
               className="text-sm text-text-secondary transition-colors hover:text-accent-gold"
             >
-              Hoạt hình
+              Chiếu rạp
             </Link>
           </div>
           <div className="flex flex-col gap-2.5 min-w-[120px]">

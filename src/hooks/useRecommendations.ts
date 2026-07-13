@@ -13,12 +13,14 @@ const TYPE_MAP: Record<string, string> = {
 
 export function useRecommendations(
   slug: string | undefined,
-  movieType: MovieDetail["type"] | undefined
+  movieType: MovieDetail["type"] | undefined,
+  enabled: boolean = true
 ) {
   const [recommendations, setRecommendations] = useState<Movie[]>([]);
 
   useEffect(() => {
-    if (!slug || !movieType) {
+    if (!enabled || !slug || !movieType) {
+      if (!enabled) return;
       setRecommendations([]);
       return;
     }
@@ -42,7 +44,7 @@ export function useRecommendations(
     return () => {
       cancelled = true;
     };
-  }, [slug, movieType]);
+  }, [slug, movieType, enabled]);
 
   return recommendations;
 }

@@ -54,22 +54,18 @@ const HeroBanner = ({ movies = [], loading = true }: HeroBannerProps) => {
 
   return (
     <section className="relative w-full min-h-[650px] lg:h-[80vh] flex items-center justify-center overflow-hidden bg-bg-void py-12 lg:py-0 select-none border-b border-border/50">
-      {/* Background Backdrops Container */}
+      {/* Background Backdrops — only active slide to avoid loading 6 images at once */}
       <div className="absolute inset-0 z-0">
-        {slides.map((slide, idx) => (
-          <div
-            key={slide._id}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              idx === activeIndex ? "opacity-35 scale-100" : "opacity-0 scale-105"
-            } transform duration-1000`}
-            style={{
-              backgroundImage: slide.poster_url ? `url(${slide.poster_url})` : "none",
-              backgroundSize: "cover",
-              backgroundPosition: "center 20%",
-              filter: "blur(4px)",
-            }}
-          />
-        ))}
+        <div
+          key={activeMovie._id}
+          className="absolute inset-0 opacity-35 scale-100 transform duration-1000"
+          style={{
+            backgroundImage: activeMovie.poster_url ? `url(${activeMovie.poster_url})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center 20%",
+            filter: "blur(4px)",
+          }}
+        />
         {/* Projector Ambient Light Beam Overlay */}
         <div className="projector-beam" />
         {/* Dark Vignette Overlay */}

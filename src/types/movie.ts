@@ -13,6 +13,7 @@ export interface Movie {
     time: string;
   } | string;
   category?: string | { id: string; name: string; slug: string }[];
+  country?: { id: string; name: string; slug: string }[];
 }
 
 export interface MovieDetail extends Movie {
@@ -21,8 +22,8 @@ export interface MovieDetail extends Movie {
   type: 'series' | 'single' | 'hoathinh' | 'tvshows';
   time: string;
   episode_total: string;
-  actor: string[] | string;
-  director: string[] | string;
+  actor: string[];
+  director: string[];
   category: { id: string; name: string; slug: string }[];
   country: { id: string; name: string; slug: string }[];
 }
@@ -41,7 +42,6 @@ export interface Episode {
 export interface MovieResponse {
   status: boolean;
   items: Movie[];
-  pathImage?: string;
   pagination: {
     totalItems: number;
     totalItemsPerPage: number;
@@ -56,14 +56,11 @@ export interface MovieDetailResponse {
   episodes: Episode[];
 }
 
-export interface Genre {
+export interface TaxonomyItem {
   _id: string;
   name: string;
   slug: string;
 }
 
-export interface Country {
-  _id: string;
-  name: string;
-  slug: string;
-}
+export type Genre = TaxonomyItem;
+export type Country = TaxonomyItem;

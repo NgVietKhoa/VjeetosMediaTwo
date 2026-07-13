@@ -1,12 +1,9 @@
 import { Movie } from '@/types/movie';
+import type { SavedMovie } from '@/utils/history';
 
 const WATCHLIST_KEY = 'vjeetos_watchlist';
 
-export interface WatchlistItem {
-  id: string;
-  name: string;
-  poster: string;
-  slug: string;
+export interface WatchlistItem extends SavedMovie {
   addedAt: number;
 }
 

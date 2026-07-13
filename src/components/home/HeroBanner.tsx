@@ -144,81 +144,60 @@ const HeroBanner = ({ movies = [], loading = true }: HeroBannerProps) => {
           </div>
         </div>
 
-        {/* Right Column: Ticket Showcase */}
+        {/* Right Column: Cinematic Showcase */}
         <div className="lg:col-span-5 flex justify-center lg:justify-end">
-          <div className="ticket-card w-full max-w-[330px] rounded-lg overflow-hidden border border-border p-5 flex flex-col gap-4 transform rotate-[1deg] hover:rotate-0 transition-all duration-300 shadow-2xl bg-bg-surface/90 backdrop-blur-md">
-            {/* Ticket Header */}
-            <div className="flex justify-between items-center border-b border-border/80 pb-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-accent-gold animate-pulse" />
-                <span className="font-mono text-[10px] font-bold tracking-wider text-text-secondary">VJEETOS CINEMA</span>
-              </div>
-              <span className="font-mono text-[10px] font-bold text-accent-gold px-2 py-0.5 bg-accent-gold/10 rounded">VIP PASS</span>
-            </div>
-
+          <div 
+            onClick={() => router.push(`/phim/chi-tiet/${activeMovie.slug}`)}
+            className="group/showcase relative w-full max-w-[310px] aspect-[2/3] rounded-xl overflow-hidden border border-border/60 bg-bg-surface/30 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.8)] hover:border-accent-gold/50 transition-all duration-500 ease-out cursor-pointer hover:scale-[1.03] select-none"
+          >
             {/* Poster Image */}
-            <div
-              className="relative w-full aspect-[16/10] bg-bg-elevated rounded-md overflow-hidden border border-border group/poster cursor-pointer"
-              onClick={() => router.push(`/phim/chi-tiet/${activeMovie.slug}`)}
-            >
-              <img
-                src={activeMovie.poster_url}
-                alt={activeMovie.name}
-                className="w-full h-full object-cover group-hover/poster:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute top-2.5 left-2.5 bg-accent-gold text-bg-void text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wide">
-                {activeMovie.quality}
-              </div>
-              <div className="absolute bottom-2.5 right-2.5 bg-black/65 backdrop-blur-sm text-text-primary text-[9px] font-bold px-2 py-0.5 rounded">
-                {activeMovie.year}
-              </div>
-            </div>
+            <img
+              src={activeMovie.poster_url || '/placeholder.png'}
+              alt={activeMovie.name}
+              className="w-full h-full object-cover group-hover/showcase:scale-105 transition-transform duration-[800ms] ease-out"
+              loading="eager"
+            />
 
-            {/* Movie Title & Info */}
-            <div className="flex flex-col gap-1 text-left">
-              <h4 className="font-display font-bold text-base text-text-primary leading-tight tracking-wide truncate">
-                {activeMovie.name}
-              </h4>
-              <p className="text-[11px] text-text-secondary truncate">{activeMovie.origin_name}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[9px] font-mono text-accent-gold bg-accent-gold/10 px-1.5 py-0.5 rounded border border-accent-gold/20 truncate max-w-[150px]">
+            {/* Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-void via-transparent to-transparent opacity-80 z-10" />
+
+            {/* Info Panel Overlay */}
+            <div className="absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-bg-void/95 via-bg-void/70 to-transparent backdrop-blur-[3px] border-t border-border/30 z-20 flex flex-col gap-2">
+              {/* Category tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {Array.isArray(activeMovie.category) &&
+                  activeMovie.category.slice(0, 2).map((cat) => (
+                    <span
+                      key={cat.id || cat.slug}
+                      className="px-2 py-0.5 rounded-[4px] text-[9px] font-bold bg-accent-gold/10 border border-accent-gold/20 text-accent-gold uppercase tracking-wider"
+                    >
+                      {cat.name}
+                    </span>
+                  ))}
+              </div>
+
+              {/* Title & Origin Name */}
+              <div className="flex flex-col gap-0.5">
+                <h4 className="font-display font-bold text-lg text-text-primary leading-tight group-hover/showcase:text-accent-gold transition-colors duration-300 truncate">
+                  {activeMovie.name}
+                </h4>
+                <p className="text-xs text-text-secondary truncate">{activeMovie.origin_name}</p>
+              </div>
+
+              {/* Metadata row */}
+              <div className="flex items-center justify-between border-t border-border/40 pt-2 mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold text-accent-gold px-1.5 py-0.5 bg-accent-gold/10 rounded border border-accent-gold/20">
+                    {activeMovie.quality}
+                  </span>
+                  <span className="text-[10px] font-semibold text-text-secondary">
+                    {activeMovie.year}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-accent-gold bg-bg-surface/90 px-2 py-0.5 rounded border border-border">
                   {activeMovie.episode_current}
                 </span>
-                <span className="text-[9px] text-text-muted font-medium">
-                  {activeMovie.lang}
-                </span>
               </div>
-            </div>
-
-            {/* Middle Notch separator */}
-            <div className="relative flex items-center justify-between my-1">
-              <div className="absolute left-[-26px] w-4 h-4 rounded-full bg-bg-void border-r border-border/50" />
-              <div className="w-full border-t border-dashed border-border/80" />
-              <div className="absolute right-[-26px] w-4 h-4 rounded-full bg-bg-void border-l border-border/50" />
-            </div>
-
-            {/* Ticket Footer details */}
-            <div className="grid grid-cols-3 gap-2 text-center py-1">
-              <div className="flex flex-col">
-                <span className="font-mono text-[8px] text-text-muted uppercase">Phòng</span>
-                <span className="font-mono text-[10px] text-text-secondary font-bold">VJ-02</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-mono text-[8px] text-text-muted uppercase">Ghế</span>
-                <span className="font-mono text-[10px] text-text-secondary font-bold">F-12 · VIP</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-mono text-[8px] text-text-muted uppercase">Mã vé</span>
-                <span className="font-mono text-[10px] text-accent-gold font-bold">#VJ-{activeMovie.year || "7789"}</span>
-              </div>
-            </div>
-
-            {/* Simulated Barcode */}
-            <div className="mt-1.5 pt-2 border-t border-border/80 flex flex-col gap-1.5 items-center">
-              <div className="barcode" />
-              <span className="font-mono text-[8px] text-text-muted tracking-[0.25em] truncate max-w-full">
-                VJ-{activeMovie.slug.slice(0, 10).toUpperCase()}
-              </span>
             </div>
           </div>
         </div>

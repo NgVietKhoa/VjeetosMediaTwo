@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useRef, Suspense } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Info,
   ChevronLeft,
-  Play,
   Layout,
   Maximize,
   Lightbulb,
@@ -20,6 +19,8 @@ import { phimApi } from "@/api/phim.api";
 import { MovieDetail, Episode } from "@/types/movie";
 import VideoPlayer from "@/components/player/VideoPlayer";
 import { historyUtil } from "@/utils/history";
+import RecommendationsCarousel from "@/components/movie/RecommendationsCarousel";
+import { useRecommendations } from "@/hooks/useRecommendations";
 
 function WatchContent() {
   const params = useParams();
@@ -35,6 +36,7 @@ function WatchContent() {
   const [currentServerIdx, setCurrentServerIdx] = useState(0);
   const [isLightsOff, setIsLightsOff] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const recommendations = useRecommendations(slug, movie?.type);
 
   useEffect(() => {
     const fetchWatchData = async () => {
@@ -318,6 +320,11 @@ function WatchContent() {
           </aside>
         </div>
       </div>
+
+      <RecommendationsCarousel
+        movies={recommendations}
+        className="max-w-[1600px] mx-auto px-4 sm:px-6 mt-12 sm:mt-16"
+      />
     </main>
   );
 }

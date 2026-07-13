@@ -1,15 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef, Suspense } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   Play,
   Calendar,
   Globe,
   Clock,
-  Tag,
-  ChevronRight,
   Info,
   Check,
   Plus,
@@ -19,16 +17,18 @@ import { phimApi } from "@/api/phim.api";
 import { MovieDetail, Episode } from "@/types/movie";
 import { watchlistUtil } from "@/utils/watchlist";
 import SprocketDivider from "@/components/common/SprocketDivider";
+import RecommendationsCarousel from "@/components/movie/RecommendationsCarousel";
+import { useRecommendations } from "@/hooks/useRecommendations";
 
 function MovieDetailContent() {
   const params = useParams();
-  const router = useRouter();
   const slug = params?.slug as string;
 
   const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const recommendations = useRecommendations(slug, movie?.type);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -39,8 +39,6 @@ function MovieDetailContent() {
         if (data.status) {
           setMovie(data.movie);
           setEpisodes(data.episodes);
-          
-          // Check watchlist status after movie loads
           setIsInWatchlist(watchlistUtil.isInWatchlist(data.movie._id));
         }
       } catch (error) {
@@ -94,12 +92,6 @@ function MovieDetailContent() {
   const defaultWatchUrl = episodes[0]?.server_data[0]?.slug
     ? `/xem/${movie.slug}?tap=${episodes[0].server_data[0].slug}`
     : `/xem/${movie.slug}`;
-
-  const movieWithRating = movie as unknown as {
-    tmdb?: { vote_average?: number };
-    imdb?: { vote_average?: number };
-  };
-  const ratingVal = movieWithRating.tmdb?.vote_average || movieWithRating.imdb?.vote_average || 7.5;
 
   return (
     <main className="pb-12 sm:pb-20">
@@ -267,21 +259,7 @@ function MovieDetailContent() {
               <div className="flex flex-col gap-3">
                 {Array.isArray(movie.actor) && movie.actor.length > 0 ? (
                   movie.actor.map((a) => (
-                    <div
-                      key={a}
-                      className="group flex cursor-default items-center gap-3.5"
-                    >
-                      <div className="h-8 w-8 shrink-0 rounded-md overflow-hidden border border-border bg-bg-elevated">
-                        <img
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(a)}&background=1a1d29&color=f4c45b&bold=true`}
-                          alt={a}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="min-w-0 text-xs font-medium text-text-secondary group-hover:text-accent-gold transition-colors">
-                        {a}
-                      </span>
-                    </div>
+                    <PersonRow key={a} name={a} />
                   ))
                 ) : (
                   <p className="text-xs italic text-text-muted">
@@ -298,21 +276,7 @@ function MovieDetailContent() {
               <div className="flex flex-col gap-3">
                 {Array.isArray(movie.director) && movie.director.length > 0 ? (
                   movie.director.map((d) => (
-                    <div
-                      key={d}
-                      className="group flex cursor-default items-center gap-3.5"
-                    >
-                      <div className="h-8 w-8 shrink-0 rounded-md overflow-hidden border border-border bg-bg-elevated">
-                        <img
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(d)}&background=1a1d29&color=f4c45b&bold=true`}
-                          alt={d}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="min-w-0 text-xs font-medium text-text-secondary group-hover:text-accent-gold transition-colors">
-                        {d}
-                      </span>
-                    </div>
+                    <PersonRow key={d} name={d} />
                   ))
                 ) : (
                   <p className="text-xs italic text-text-muted">
@@ -324,6 +288,8 @@ function MovieDetailContent() {
           </aside>
         </div>
       </div>
+
+      <RecommendationsCarousel movies={recommendations} />
     </main>
   );
 }
@@ -337,5 +303,22 @@ export default function MovieDetailPage() {
     }>
       <MovieDetailContent />
     </Suspense>
+  );
+}
+
+function PersonRow({ name }: { name: string }) {
+  return (
+    <div className="group flex cursor-default items-center gap-3.5">
+      <div className="h-8 w-8 shrink-0 rounded-md overflow-hidden border border-border bg-bg-elevated">
+        <img
+          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a1d29&color=f4c45b&bold=true`}
+          alt={name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <span className="min-w-0 text-xs font-medium text-text-secondary group-hover:text-accent-gold transition-colors">
+        {name}
+      </span>
+    </div>
   );
 }

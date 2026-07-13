@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Clapperboard, Loader2, SlidersHorizontal } from 'lucide-react';
 import MovieCard from '@/components/movie/MovieCard';
+import Pagination from '@/components/common/Pagination';
 import { phimApi } from '@/api/phim.api';
 import { Movie, Genre, Country } from '@/types/movie';
 
@@ -332,53 +333,7 @@ function MovieListContent() {
             ))}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-16 select-none">
-              <button
-                onClick={() => handlePageChange(Math.max(1, page - 1))}
-                disabled={page === 1}
-                className="px-3.5 py-1.5 rounded bg-bg-surface border border-border hover:border-accent-gold hover:text-accent-gold disabled:opacity-40 disabled:hover:border-border disabled:hover:text-text-primary text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Trước
-              </button>
-
-              {Array.from({ length: Math.min(5, totalPages) }, (_, idx) => {
-                let pNum = page;
-                if (page <= 3) {
-                  pNum = idx + 1;
-                } else if (page >= totalPages - 2) {
-                  pNum = totalPages - 4 + idx;
-                } else {
-                  pNum = page - 2 + idx;
-                }
-
-                if (pNum < 1 || pNum > totalPages) return null;
-
-                return (
-                  <button
-                    key={pNum}
-                    onClick={() => handlePageChange(pNum)}
-                    className={`px-3 py-1 rounded text-xs font-mono font-semibold transition-colors border cursor-pointer
-                      ${page === pNum
-                        ? 'bg-accent-gold text-bg-void border-accent-gold'
-                        : 'bg-bg-surface border-border hover:border-accent-gold hover:text-accent-gold'
-                      }`}
-                  >
-                    {pNum}
-                  </button>
-                );
-              })}
-
-              <button
-                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                disabled={page === totalPages}
-                className="px-3.5 py-1.5 rounded bg-bg-surface border border-border hover:border-accent-gold hover:text-accent-gold disabled:opacity-40 disabled:hover:border-border disabled:hover:text-text-primary text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Sau
-              </button>
-            </div>
-          )}
+          <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-32 text-center bg-bg-surface rounded-lg border border-border border-dashed px-6">

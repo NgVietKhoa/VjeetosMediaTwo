@@ -3,12 +3,15 @@ import { Movie } from '@/types/movie';
 const HISTORY_KEY = 'vjeetos_watch_history';
 const MAX_HISTORY = 20;
 
-export interface HistoryItem {
+export interface SavedMovie {
   id: string;
   name: string;
   poster: string;
   slug: string;
-  lastTreated: number; // timestamp
+}
+
+export interface HistoryItem extends SavedMovie {
+  lastTreated: number;
 }
 
 export const historyUtil = {
